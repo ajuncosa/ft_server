@@ -1,0 +1,28 @@
+server {
+	listen 443 ssl;
+	include /etc/nginx/snippets/self-signed.conf;
+
+
+	root /var/www;
+	server_name localhost;
+
+	location / {
+	    autoindex	on;
+	    index	index.php index.html;
+	    try_files	$uri $uri/ /index.php?$args;
+	}	
+
+	location ~ \.php$ {
+		include snippets/fastcgi-php.conf;
+		fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+		fastcgi_param   SCRIPT_FILENAME $document_root$fastcgi_script_name;
+	}
+}
+
+server {
+    listen 80;
+
+    server_name localhost;
+
+    return 302 https://$server_name$request_uri;
+}
